@@ -27,9 +27,17 @@ class Question(models.Model):
     type = models.CharField(max_length=4, choices=QUESTION_TYPES)
     text = models.TextField()
     points = models.PositiveIntegerField(default=1)
-    options = models.JSONField(blank=True, null=True, 
-                             help_text="For multiple choice: {'choices': ['Option 1', 'Option 2']}")
+    options = models.JSONField(blank=True, null=True, help_text="For multiple choice: {'choices': ['Option 1', 'Option 2']}")
     correct_answer = models.TextField(blank=True)
 
     def __str__(self):
         return f"{self.get_type_display()} Question - {self.text[:50]}..."
+
+class Answer(models.Model):
+    question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='answers')
+    candidate = models.ForeignKey(CandidateProfile, on_delete=models.CASCADE, related_name='answers', null=True, blank=True)
+    response = models.TextField(blank=True)
+    is_correct = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"Answer to {self.question.text[:50]} by {self.candidate.user.username if self.candidate else 'N/A'}"
