@@ -1,0 +1,13 @@
+<ul class="list-group">
+    {% for activity in activities %}
+    <li class="list-group-item d-flex justify-content-between align-items-start">
+        <div class="ms-2 me-auto">
+            <div class="fw-bold">{{ activity.type }}</div>
+            {{ activity.description }}
+        </div>
+        <small class="text-muted">{{ activity.timestamp|timesince }} ago</small>
+    </li>
+    {% empty %}
+    <li class="list-group-item text-muted">No recent activity</li>
+    {% endfor %}
+</ul>

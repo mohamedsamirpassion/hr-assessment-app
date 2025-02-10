@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header bg-primary text-white">
+        <h4>Create New Assessment</h4>
+    </div>
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-success">Create Assessment</button>
+            <a href="{% url 'hr_dashboard' %}" class="btn btn-secondary">Cancel</a>
+        </form>
+        
+        <hr>
+        
+        <h5 class="mt-4">Your Existing Assessments</h5>
+        <div class="list-group">
+            {% for assessment in assessments %}
+            <a href="{% url 'add_questions' assessment.id %}" 
+               class="list-group-item list-group-item-action">
+                {{ assessment.title }} ({{ assessment.questions.count }} questions)
+            </a>
+            {% empty %}
+            <div class="alert alert-info">No assessments created yet</div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

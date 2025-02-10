@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        <h2>Welcome, Candidate!</h2>
+        <p class="lead">Your assigned assessments will appear here.</p>
+        
+        <div class="list-group">
+            <!-- Example Assessment -->
+            <a href="#" class="list-group-item list-group-item-action">
+                <div class="d-flex w-100 justify-content-between">
+                    <h5 class="mb-1">Software Engineering Test</h5>
+                    <small>Due: Feb 15, 2025</small>
+                </div>
+                <p class="mb-1">Basic programming concepts and algorithms</p>
+                <small>Click to start assessment</small>
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

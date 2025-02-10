@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header bg-info text-white">
+        <h4>Add Questions to: {{ assessment.title }}</h4>
+    </div>
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-primary">Add Question</button>
+            <a href="{% url 'create_assessment' %}" class="btn btn-secondary">Finish</a>
+        </form>
+
+        <hr>
+
+        <h5 class="mt-4">Existing Questions</h5>
+        <div class="list-group">
+            {% for question in questions %}
+            <div class="list-group-item">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <strong>{{ question.get_type_display }} ({{ question.points }} pts):</strong>
+                        {{ question.text }}
+                    </div>
+                    <div>
+                        <a href="#" class="btn btn-sm btn-warning">Edit</a>
+                        <a href="#" class="btn btn-sm btn-danger">Delete</a>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="alert alert-info">No questions added yet</div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
