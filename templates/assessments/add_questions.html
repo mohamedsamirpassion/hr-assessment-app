@@ -1,38 +1,137 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block content %}
-<div class="card">
-    <div class="card-header bg-info text-white">
-        <h4>Add Questions to: {{ assessment.title }}</h4>
+<div class="card shadow-lg">
+    <div class="card-header bg-primary text-white">
+        <div class="d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">Add Questions to: {{ assessment.title }}</h4>
+            <a href="{% url 'create_assessment' %}" class="btn btn-light btn-sm">
+                <i class="bi bi-arrow-left"></i> Back to Assessments
+            </a>
+        </div>
     </div>
+    
     <div class="card-body">
-        <form method="post">
+        <!-- Messages Display -->
+        {% if messages %}
+        <div class="mb-4">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Question Form -->
+        <form method="post" action="{% url 'add_questions' assessment_id=assessment.id %}">
             {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit" class="btn btn-primary">Add Question</button>
-            <a href="{% url 'create_assessment' %}" class="btn btn-secondary">Finish</a>
-        </form>
+            <div class="row g-3">
+                <div class="col-md-12">
+                    <label class="form-label">Question Type</label>
+                    {{ form.type }}
+                </div>
+                <div class="col-md-12">
+                    <label class="form-label">Question Text</label>
+                    {{ form.text }}
+                    {% if form.text.errors %}
+                    <div class="text-danger">{{ form.text.errors }}</div>
+                    {% endif %}
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Points</label>
+                    {{ form.points }}
+                    {% if form.points.errors %}
+                    <div class="text-danger">{{ form.points.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <!-- Updated Options Field -->
+                <div class="col-md-12" id="options-field" style="display: none;">
+                    <label class="form-label">Options</label>
+                    <input type="text" 
+                           name="options" 
+                           class="form-control {% if form.options.errors %}is-invalid{% endif %}" 
+                           value="{{ form.options.value|default:'' }}"
+                           placeholder="Enter options separated by commas (e.g., Yes, No, Maybe)">
+                    {% for error in form.options.errors %}
+                    <div class="invalid-feedback">{{ error }}</div>
+                    {% endfor %}
+                    <small class="text-muted">For multiple choice questions only</small>
+                </div>
 
-        <hr>
-
-        <h5 class="mt-4">Existing Questions</h5>
-        <div class="list-group">
-            {% for question in questions %}
-            <div class="list-group-item">
-                <div class="d-flex justify-content-between">
-                    <div>
-                        <strong>{{ question.get_type_display }} ({{ question.points }} pts):</strong>
-                        {{ question.text }}
-                    </div>
-                    <div>
-                        <a href="#" class="btn btn-sm btn-warning">Edit</a>
-                        <a href="#" class="btn btn-sm btn-danger">Delete</a>
-                    </div>
+                <div class="col-md-12">
+                    <label class="form-label">Correct Answer</label>
+                    {{ form.correct_answer }}
+                    {% if form.correct_answer.errors %}
+                    <div class="text-danger">{{ form.correct_answer.errors }}</div>
+                    {% endif %}
                 </div>
             </div>
-            {% empty %}
-            <div class="alert alert-info">No questions added yet</div>
-            {% endfor %}
+            <button type="submit" class="btn btn-success mt-3">Add Question</button>
+        </form>
+
+        <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const typeSelect = document.querySelector('#id_type');
+            const optionsField = document.querySelector('[name="options"]').closest('.col-md-12');
+            const optionsInput = document.querySelector('[name="options"]');
+
+            function toggleOptions() {
+                const isMC = typeSelect.value === 'MC';
+                optionsField.style.display = isMC ? 'block' : 'none';
+                if (!isMC) optionsInput.value = '';
+            }
+
+            // Initialize existing MC question values
+            {% if form.initial.options %}
+            optionsInput.value = "{{ form.initial.options|join:', ' }}";
+            {% endif %}
+
+            typeSelect.addEventListener('change', toggleOptions);
+            toggleOptions(); // Initial check
+        });
+        </script>
+
+        <hr class="my-5">
+
+        <!-- Existing Questions -->
+        <div class="mt-4">
+            <h5 class="mb-3">Existing Questions ({{ questions.count }})</h5>
+            
+            {% if questions %}
+            <div class="list-group">
+                {% for question in questions %}
+                <div class="list-group-item list-group-item-action">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div class="ms-2 me-auto">
+                            <div class="fw-bold">{{ question.get_type_display }}</div>
+                            {{ question.text }}
+                            {% if question.options.choices %}
+                            <div class="mt-2 text-muted">
+                                <small>Options: {{ question.options.choices|join:", " }}</small>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="btn-group">
+                            <a href="#" class="btn btn-sm btn-outline-warning">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <a href="#" class="btn btn-sm btn-outline-danger">
+                                <i class="bi bi-trash"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="alert alert-info">
+                <i class="bi bi-info-circle"></i> No questions added yet
+            </div>
+            {% endif %}
         </div>
     </div>
 </div>

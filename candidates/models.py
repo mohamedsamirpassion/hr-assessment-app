@@ -17,16 +17,17 @@ class CandidateProfile(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    # Additional candidate-specific fields
     phone_number = models.CharField(
         max_length=20,
         null=True,
-        blank=True
+        blank=True,
+        verbose_name='Contact Number'
     )
     linkedin_profile = models.URLField(
         max_length=200,
         null=True,
-        blank=True
+        blank=True,
+        verbose_name='LinkedIn Profile'
     )
 
     class Meta:

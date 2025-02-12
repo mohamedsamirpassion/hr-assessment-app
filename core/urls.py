@@ -6,8 +6,8 @@ from hr.views import (
     create_assessment, view_candidates, view_results
 )
 from candidates.views import candidate_login, candidate_dashboard, candidate_logout
-from assessments.views import create_assessment, add_questions, create_question, view_assessment  # Add these imports
-from hr.views import recent_activities  # Add this import
+from assessments.views import create_assessment, add_questions, create_question, view_assessment
+from hr.views import recent_activities
 
 urlpatterns = [
     # Admin interface
@@ -30,10 +30,9 @@ urlpatterns = [
     path('candidate/logout/', candidate_logout, name='candidate_logout'),
     
     # Assessment URLs
-    path('hr/assessments/create/', create_assessment, name='create_assessment'),
     path('hr/assessments/<int:assessment_id>/questions/', add_questions, name='add_questions'),
-    path('hr/assessments/<int:assessment_id>/create-question/', create_question, name='create_question'),  # New URL for creating questions
-    path('hr/assessments/<int:assessment_id>/view/', view_assessment, name='view_assessment'),  # New URL for viewing assessments
+    path('hr/assessments/<int:assessment_id>/create-question/', create_question, name='create_question'),
+    path('hr/assessments/<int:assessment_id>/view/', view_assessment, name='view_assessment'),
     
     # Root redirect
     path('', lambda request: redirect('hr_login')),
