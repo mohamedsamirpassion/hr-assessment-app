@@ -48,16 +48,12 @@
                     {% endif %}
                 </div>
                 
-                <!-- Updated Options Field -->
+                <!-- Options Field -->
                 <div class="col-md-12" id="options-field" style="display: none;">
                     <label class="form-label">Options</label>
-                    <input type="text" 
-                           name="options" 
-                           class="form-control {% if form.options.errors %}is-invalid{% endif %}" 
-                           value="{{ form.options.value|default:'' }}"
-                           placeholder="Enter options separated by commas (e.g., Yes, No, Maybe)">
+                    {{ form.options }}
                     {% for error in form.options.errors %}
-                    <div class="invalid-feedback">{{ error }}</div>
+                    <div class="invalid-feedback d-block">{{ error }}</div>
                     {% endfor %}
                     <small class="text-muted">For multiple choice questions only</small>
                 </div>
@@ -74,26 +70,30 @@
         </form>
 
         <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const typeSelect = document.querySelector('#id_type');
-            const optionsField = document.querySelector('[name="options"]').closest('.col-md-12');
-            const optionsInput = document.querySelector('[name="options"]');
-
-            function toggleOptions() {
-                const isMC = typeSelect.value === 'MC';
-                optionsField.style.display = isMC ? 'block' : 'none';
-                if (!isMC) optionsInput.value = '';
-            }
-
-            // Initialize existing MC question values
-            {% if form.initial.options %}
-            optionsInput.value = "{{ form.initial.options|join:', ' }}";
-            {% endif %}
-
-            typeSelect.addEventListener('change', toggleOptions);
-            toggleOptions(); // Initial check
-        });
-        </script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const typeSelect = document.querySelector('#id_type');
+                const optionsField = document.getElementById('options-field');
+                const optionsInput = document.querySelector('[name="options"]');
+            
+                function toggleOptions() {
+                    const isMC = typeSelect.value === 'MC';
+                    optionsField.style.display = isMC ? 'block' : 'none';
+                    if (!isMC) optionsInput.value = '';
+                }
+            
+                // Initialize options safely
+                {% if form.initial.options and form.initial.type == 'MC' %}
+                try {
+                    optionsInput.value = "{{ form.initial.options|escapejs }}";
+                } catch (e) {
+                    console.error('Error initializing options:', e);
+                }
+                {% endif %}
+            
+                typeSelect.addEventListener('change', toggleOptions);
+                toggleOptions(); // Initial check
+            });
+            </script>
 
         <hr class="my-5">
 
@@ -109,7 +109,7 @@
                         <div class="ms-2 me-auto">
                             <div class="fw-bold">{{ question.get_type_display }}</div>
                             {{ question.text }}
-                            {% if question.options.choices %}
+                            {% if question.type == 'MC' and question.options.choices %}
                             <div class="mt-2 text-muted">
                                 <small>Options: {{ question.options.choices|join:", " }}</small>
                             </div>
